@@ -245,6 +245,24 @@ def restart_game(window, tiles):
         tiles[key] = tile
     draw(window, tiles)  # Redraw the initial game state
 
+def game_win(tiles, window):
+    for tile in tiles.values():
+        if tile.value == 2048:
+            win_font = pygame.font.SysFont("arial", 72)
+            win_text = win_font.render("You Win!", True, (255, 215, 0))
+            text_x = WIDTH / 2 - win_text.get_width() / 2
+            text_y = HEIGHT / 2 - win_text.get_height() / 2
+
+            window.blit(win_text, (text_x, text_y))
+            pygame.display.update()
+
+            # Pause the game for a few seconds before restarting
+            pygame.time.delay(3000)  # Delay for 3000 milliseconds (3 seconds)
+            return True
+    return False
+
+
+
 def update_tiles(window,tiles, sorted_tiles):
     tiles.clear()
     for tile in sorted_tiles:
@@ -275,18 +293,22 @@ def main(window):
                 break
 
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    restart_game(window, tiles)
-                if event.key == pygame.K_LEFT:
-                    move_tiles(window, tiles, clock, "left")
-                if event.key == pygame.K_RIGHT:
-                    move_tiles(window, tiles, clock, "right")
-                if event.key == pygame.K_UP:
-                    move_tiles(window, tiles, clock, "up")
-                if event.key == pygame.K_DOWN:
-                    move_tiles(window, tiles, clock, "down")
+                directions = {
+                    pygame.K_LEFT: "left",
+                    pygame.K_RIGHT: "right",
+                    pygame.K_UP: "up",
+                    pygame.K_DOWN: "down"
+                }
+                if event.key in directions:
+                    move_tiles(window, tiles, clock, directions[event.key])
+                    if game_win(tiles, window):
+                        # Restart the game
+                        tiles = generate_tiles()  # Reinitialize the game tiles
+                        continue  # Continue in the game loop
             
         draw(window, tiles)
+        pygame.display.update()
+        clock.tick(FPS)
 
 if __name__ == "__main__":
     main(WINDOW)
