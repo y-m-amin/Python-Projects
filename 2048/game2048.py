@@ -204,10 +204,10 @@ def move_tiles(window, tiles, clock, direction):
 def end_move(tiles,window):
     if len(tiles) == 16:
         # Create the 'Game Over' message
-        game_over_font = pygame.font.SysFont("verdana", 52)  # You can adjust the font and size
+        game_over_font = pygame.font.SysFont("verdana", 52)  
         restart_msg_font = pygame.font.SysFont("verdana", 46)
         game_over_text = game_over_font.render("Game Over!!!", True, (32, 35, 36))  
-        restart_msg_text = restart_msg_font.render("Press escape to Restart", True, (32, 35, 36)) # Red color for the text
+        restart_msg_text = restart_msg_font.render("Press escape to Restart", True, (32, 35, 36)) 
         over_text_x = WIDTH / 2 - game_over_text.get_width() / 2
         over_text_y = HEIGHT / 2 - game_over_text.get_height() / 2
         restart_text_x = WIDTH / 2 - restart_msg_text.get_width() / 2
@@ -290,3 +290,5 @@ def main(window):
 
 if __name__ == "__main__":
     main(WINDOW)
+
+# python -m PyInstaller --onefile --windowed scriptxy.py
