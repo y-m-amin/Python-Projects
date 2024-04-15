@@ -47,6 +47,10 @@ class Tile:
         (237, 208, 115),
         (237, 204, 99),
         (236, 202, 80),
+        (237, 229, 218),
+        (238, 225, 201),
+        (243, 178, 122),
+        (246, 150, 101),
         ]
 
     def __init__(self,value,row,col):
@@ -191,14 +195,41 @@ def move_tiles(window, tiles, clock, direction):
 
         update_tiles(window,tiles, sorted_tiles)
     
-    result = end_move(tiles, window)  # Now passing 'window' as an argument
+    result = end_move(tiles, window)  
 
-    # Depending on 'result', you can decide what to do next
+    
     if result == "restart":
         print("Game restarted due to full grid.")
 
 def end_move(tiles,window):
     if len(tiles) == 16:
+        # Create the 'Game Over' message
+        game_over_font = pygame.font.SysFont("verdana", 52)  # You can adjust the font and size
+        restart_msg_font = pygame.font.SysFont("verdana", 46)
+        game_over_text = game_over_font.render("Game Over!!!", True, (32, 35, 36))  
+        restart_msg_text = restart_msg_font.render("Press escape to Restart", True, (32, 35, 36)) # Red color for the text
+        over_text_x = WIDTH / 2 - game_over_text.get_width() / 2
+        over_text_y = HEIGHT / 2 - game_over_text.get_height() / 2
+        restart_text_x = WIDTH / 2 - restart_msg_text.get_width() / 2
+        restart_text_y = HEIGHT / 2 - restart_msg_text.get_height() / 2 + game_over_text.get_height() 
+
+        # Draw the 'Game Over' message in the center of the screen
+        #window.fill((0, 0, 0))  # Optional: fill the screen with black before displaying the message
+        window.blit(game_over_text, (over_text_x, over_text_y))
+        window.blit(restart_msg_text, (restart_text_x, restart_text_y))
+        pygame.display.update()  # Update the display to show the game over message
+
+        # Wait for the user to press the escape key
+        waiting_for_escape = True
+        while waiting_for_escape:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        waiting_for_escape = False
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
         restart_game(window, tiles)
         return "restart"
     
