@@ -15,6 +15,13 @@ except ImportError:
     install("pygame")
     import pygame
 
+try:
+    from PIL import Image, ImageFilter
+except ImportError:
+    print("pillow is not installed. Installing now...")
+    install("pillow")
+    from PIL import Image, ImageFilter
+
 pygame.init()
 
 FPS = 60
@@ -203,6 +210,7 @@ def move_tiles(window, tiles, clock, direction):
 
 def end_move(tiles,window):
     if len(tiles) == 16:
+        apply_gaussian_blur(window)
         # Create the 'Game Over' message
         game_over_font = pygame.font.SysFont("verdana", 52)  
         restart_msg_font = pygame.font.SysFont("verdana", 46)
@@ -233,8 +241,12 @@ def end_move(tiles,window):
         restart_game(window, tiles)
         return "restart"
     
+    max_value = max(tile.value for tile in tiles.values())  # Get the maximum value in the current tiles
+    tile_values = [4, 8] if max_value >= 512 else [2, 4]  # Decide which values to choose from based on max_value
+
     row, col = get_random_pos(tiles)
-    tiles[f"{row}{col}"] = Tile(random.choice([2,4]),row,col)
+    tiles[f"{row}{col}"] = Tile(random.choice(tile_values), row, col)  # Set the new tile
+  
     return "continue"
 
 def restart_game(window, tiles):
@@ -248,6 +260,7 @@ def restart_game(window, tiles):
 def game_win(tiles, window):
     for tile in tiles.values():
         if tile.value == 2048:
+            apply_gaussian_blur(window) 
             win_font = pygame.font.SysFont("arial", 72)
             win_text = win_font.render("You Win!", True, (255, 215, 0))
             text_x = WIDTH / 2 - win_text.get_width() / 2
@@ -277,6 +290,24 @@ def generate_tiles():
         tiles [ f"{row}{col}" ] = Tile(2,row,col)
 
     return tiles
+
+
+def apply_gaussian_blur(window):
+    # Capture the current Pygame screen image
+    pygame_surface = pygame.display.get_surface()
+    pil_string_image = pygame.image.tostring(pygame_surface, 'RGBA', False)
+    pil_image = Image.frombytes('RGBA', pygame_surface.get_size(), pil_string_image)
+    
+    # Apply Gaussian Blur
+    blurred_image = pil_image.filter(ImageFilter.GaussianBlur(10))
+    
+    # Convert back to Pygame surface
+    mode = blurred_image.mode
+    size = blurred_image.size
+    str_img = blurred_image.tobytes()
+    blurred_surface = pygame.image.fromstring(str_img, size, mode)
+    window.blit(blurred_surface, (0, 0))
+    pygame.display.update()
 
 def main(window):
     clock = pygame.time.Clock()
