@@ -242,7 +242,14 @@ def end_move(tiles,window):
         return "restart"
     
     max_value = max(tile.value for tile in tiles.values())  # Get the maximum value in the current tiles
-    tile_values = [4, 8] if max_value >= 512 else [2, 4]  # Decide which values to choose from based on max_value
+    # Check if any tile with value 2 exists
+    has_two = any(tile.value == 2 for tile in tiles.values())
+
+    # If max >= 512 AND no 2 exists, then switch to 4 + 8
+    if max_value >= 512 and not has_two:
+        tile_values = [4, 8]
+    else:
+        tile_values = [2, 4]
 
     row, col = get_random_pos(tiles)
     tiles[f"{row}{col}"] = Tile(random.choice(tile_values), row, col)  # Set the new tile
@@ -345,3 +352,4 @@ if __name__ == "__main__":
     main(WINDOW)
 
 # python -m PyInstaller --onefile --windowed scriptxy.py
+
